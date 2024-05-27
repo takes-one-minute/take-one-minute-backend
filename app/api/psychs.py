@@ -3,12 +3,12 @@ from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import SQLAlchemyError
 
-from app.db.session import get_db
-from app.db.schemas import user_schema, psychs_schma
-from app.db.crud.user import user_create, user_read, user_update, user_delete
-from app.db.crud.psychs import psychs_create, psychs_read, psychs_update, psychs_delete
+from db.session import get_db
+from db.schemas import user_schema, psychs_schma
+from db.crud.user import user_create, user_read, user_update, user_delete
+from db.crud.psychs import psychs_create, psychs_read, psychs_update, psychs_delete
 
-from app.utils import utils, jwt, hash
+from utils import utils, jwt, hash
 
 # OAuth2 Password Bearer
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/users/login")

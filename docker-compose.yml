@@ -1,0 +1,15 @@
+version: 'v1'
+services:
+  takeonemiutes:
+    container_name: takeonemiutes
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    restart: 'always'
+    env_file:
+      - path: /var/jenkins_home/workspace/.env
+        required: false
+    volumes:
+      - ./app:/app
+    ports:
+      - "8000:8000"

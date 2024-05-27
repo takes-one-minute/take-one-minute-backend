@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from app.db.models import user_model
+from db.models import user_model
 from sqlalchemy import or_, and_
 
 def find_user_by_email(db: Session, email: str):

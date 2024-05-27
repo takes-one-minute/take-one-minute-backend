@@ -1,6 +1,6 @@
 from jose import jwt, JWTError
 from datetime import datetime, timedelta, timezone
-from app.core.config import get_settings
+from core.config import get_settings
 from fastapi import HTTPException
 
 async def create_token(subject: str , user_id: int, expires_delta: timedelta = None):

@@ -1,4 +1,4 @@
-from app.db.session import Base
+from db.session import Base
 from sqlalchemy import Boolean, Column, Integer, String, ForeignKey, BigInteger, SmallInteger, DateTime, Text
 from sqlalchemy.orm import relationship
 from sqlalchemy.dialects.postgresql import ENUM

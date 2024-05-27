@@ -1,6 +1,6 @@
 from fastapi import APIRouter
-from app.api import users, psychs
-from app.core.config import Settings
+from api import users, psychs
+from core.config import Settings
 
 router = APIRouter()
 

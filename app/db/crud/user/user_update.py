@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta, timezone
 from sqlalchemy.orm import Session
-from app.db.crud.user import user_read
+from db.crud.user import user_read
 
 async def update_user_for_login(db: Session, db_user, public_ip: str, last_login: datetime = datetime.now(timezone.utc)):
     """사용자의 로그인 정보를 업데이트합니다."""

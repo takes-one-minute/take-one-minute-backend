@@ -1,0 +1,8 @@
+argon2-cffi
+fastapi
+uvicorn[standard]
+passlib
+python-jose
+pydantic
+sqlalchemy
+python-dotenv

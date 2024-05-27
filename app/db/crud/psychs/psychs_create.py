@@ -1,8 +1,8 @@
 from sqlalchemy.orm import Session
-from app.db.schemas import psychs_schma, user_schema
-from app.db.models import user_model, psych_model
-from app.utils import hash
-from app.db.crud.user import user_read
+from db.schemas import psychs_schma, user_schema
+from db.models import user_model, psych_model
+from utils import hash
+from db.crud.user import user_read
 from datetime import datetime, timezone
 
 async def create_post(db: Session, post: psychs_schma.PsychArticleCreate, user_id: int):

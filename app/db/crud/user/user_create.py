@@ -1,8 +1,8 @@
 from sqlalchemy.orm import Session
-from app.db.schemas.user_schema import *
-from app.db.models import user_model
-from app.utils import hash
-from app.db.crud.user import user_read
+from db.schemas.user_schema import *
+from db.models import user_model
+from utils import hash
+from db.crud.user import user_read
 from datetime import datetime, timezone
 
 async def create_user(db: Session, user: UserCreate):

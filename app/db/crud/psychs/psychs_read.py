@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session, joinedload
-from app.db.schemas import psychs_schma, user_schema
-from app.db.models import user_model, psych_model
+from db.schemas import psychs_schma, user_schema
+from db.models import user_model, psych_model
 from datetime import datetime, timezone
 
 def get_psych_posts_with_authors(db: Session, page_number: int = 1, limit: int = 10):
