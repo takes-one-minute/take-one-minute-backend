@@ -12,6 +12,7 @@ app = FastAPI()
 
 app.include_router(api_router)
 
+
 if __name__ == "__main__":
     # For Production Build
     # uvicorn.run("main:app", host="0.0.0.0", port=8000)

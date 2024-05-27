@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, status
-from fastapi.security import OAuth2PasswordBearer
+from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import SQLAlchemyError
 
@@ -32,42 +32,48 @@ async def register_user(user: user_schema.UserCreate, db: Session = Depends(get_
         access_token = await jwt.create_access_token("access", db_user.id)
         refresh_token = await jwt.create_refresh_token("refresh", db_user.id)
         await user_create.create_jwt(db, db_user.id, access_token, refresh_token, user.public_ip)
+
         return user_schema.JwtToken(access_token=access_token, refresh_token=refresh_token)
 
     except HTTPException as http_ex:
         db.rollback()
+
         raise http_ex
 
     except SQLAlchemyError as e:
         db.rollback()
+
+        print(e)
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Internal server error")
 
     except Exception as e:
         db.rollback()
+
+        print(e)
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Internal server error")
 
     finally:
         db.close()
 
 @router.post("/login", response_model=user_schema.JwtToken, status_code=status.HTTP_200_OK)
-async def login_user(user: user_schema.UserLogin, db: Session = Depends(get_db)):
+async def login_user(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
     try:
         # Check if the email is valid
-        db_user = user_read.find_user_for_login(db, user.account)
+        db_user = user_read.find_user_for_login(db, form_data.username)
         if not db_user:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
 
         # Check if the password is valid
-        if not hash.verify_hashed_text(user.password, db_user.hashed_password):
+        if not hash.verify_hashed_text(form_data.password, db_user.hashed_password):
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Incorrect password")
         
         # Update the last public IP and last login time
-        await user_update.update_user_for_login(db, db_user, user.public_ip)
+        await user_update.update_user_for_login(db, db_user, "0.0.0.0")
         
         # Create JWT tokens
         access_token = await jwt.create_access_token("access", db_user.id)
         refresh_token = await jwt.create_refresh_token("refresh", db_user.id)
-        await user_create.create_jwt(db, db_user.id, access_token, refresh_token, user.public_ip)
+        await user_create.create_jwt(db, db_user.id, access_token, refresh_token, "0.0.0.0")
         return user_schema.JwtToken(access_token=access_token, refresh_token=refresh_token)
     
     except HTTPException as http_ex:
