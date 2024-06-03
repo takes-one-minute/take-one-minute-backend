@@ -13,39 +13,67 @@ class PsychArticle(Base):
     title = Column(String(255), nullable=False)
     description = Column(Text)
     
-    type = Column(Enum(psychs_schma.PsychType), index=True)
+    type = Column(Enum(psychs_schma.PsychType), nullable=False)
+    visibility = Column(Enum(psychs_schma.PsychVisibility), nullable=False, default=psychs_schma.PsychVisibility.PUBLIC)
 
     thumbnail_url = Column(String(255))
     
     created_at = Column(DateTime, nullable=False, default=datetime.now(timezone.utc))
     updated_at = Column(DateTime)
-    try_count = Column(Integer, nullable=False, default=0) # 이 테스트를 시도해본 수(조회수)
+    view_count = Column(Integer, nullable=False, default=0)
 
     author_id = Column(Integer, ForeignKey('users.id'))
 
-    author = relationship("User", back_populates="posts")
-    questions = relationship("PsychArticleQuestions", back_populates="post")
-    results = relationship("PsychArticleResult", back_populates="post")
+    author = relationship("User", back_populates="articles")
+    questions = relationship("PsychArticleQuestions", back_populates="article")
+    results = relationship("PsychArticleResult", back_populates="article")
+    password = relationship("PsychArticlePassword", back_populates="article", uselist=False) # 일대일 관계 설정
+
 
 class PsychArticleQuestions(Base):
     __tablename__ = "psych_article_questions"
 
     id = Column(Integer, primary_key=True)
-    title = Column(String(255), nullable=False)
+    question = Column(String(255), nullable=False)
     description = Column(Text) 
     score = Column(Integer, nullable=False, default=0)
 
-    post_id = Column(Integer, ForeignKey('psych_articles.id'))
-    post = relationship("PsychArticle", back_populates="questions")
+    article_id = Column(Integer, ForeignKey('psych_articles.id'))
+
+    article = relationship("PsychArticle", back_populates="questions")
+    answers = relationship("PsychArticleAnswer", back_populates="question", cascade="all, delete-orphan") # cascade="all, delete-orphan" = 부모가 삭제되면 자식도 삭제됨(일대다관계 설정)
+
+class PsychArticleAnswer(Base):
+    __tablename__ = "psych_article_answers"
+    
+    id = Column(Integer, primary_key=True)
+    answer = Column(Text, nullable=False)
+    score = Column(Integer, nullable=False, default=0)
+
+    article_id = Column(Integer, ForeignKey('psych_articles.id'))
+    question_id = Column(Integer, ForeignKey('psych_article_questions.id'))
+    
+    question = relationship("PsychArticleQuestions", back_populates="answers")
 
 class PsychArticleResult(Base):
     __tablename__ = "psych_article_results"
 
     id = Column(Integer, primary_key=True)
-    title = Column(String(255), nullable=False)
-    description = Column(Text, nullable=False)
-    score = Column(Integer, nullable=False, default=0)
+    title = Column(Text, nullable=False)
+    description = Column(Text)
 
-    post_id = Column(Integer, ForeignKey('psych_articles.id'))
-    post = relationship("PsychArticle", back_populates="results")
+    article_id = Column(Integer, ForeignKey('psych_articles.id'))
 
+    article = relationship("PsychArticle", back_populates="results")
+
+
+
+class PsychArticlePassword(Base):
+    __tablename__ = "psych_article_passwords"
+
+    id = Column(Integer, primary_key=True)
+    password = Column(String(255), nullable=False)
+
+    article_id = Column(Integer, ForeignKey('psych_articles.id'))
+
+    article = relationship("PsychArticle", back_populates="password")

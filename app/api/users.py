@@ -9,6 +9,8 @@ from db.crud.user import user_create, user_read, user_update, user_delete
 
 from utils import utils, jwt, hash
 
+import traceback
+
 # OAuth2 Password Bearer
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/users/login")
 
@@ -38,18 +40,25 @@ async def register_user(user: user_schema.UserCreate, db: Session = Depends(get_
     except HTTPException as http_ex:
         db.rollback()
 
+        err_msg = traceback.format_exc()
+        print(err_msg)
+
         raise http_ex
 
     except SQLAlchemyError as e:
         db.rollback()
 
-        print(e)
+        err_msg = traceback.format_exc()
+        print(err_msg)
+
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Internal server error")
 
     except Exception as e:
         db.rollback()
 
-        print(e)
+        err_msg = traceback.format_exc()
+        print(err_msg)
+
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Internal server error")
 
     finally:
@@ -78,16 +87,26 @@ async def login_user(form_data: OAuth2PasswordRequestForm = Depends(), db: Sessi
     
     except HTTPException as http_ex:
         db.rollback()
+
+        err_msg = traceback.format_exc()
+        print(err_msg)
+
         raise http_ex
 
     except SQLAlchemyError as e:
         db.rollback()
-        print(f"[LOG]->{e}")
+
+        err_msg = traceback.format_exc()
+        print(err_msg)
+
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Internal server error")
 
     except Exception as e:
         db.rollback()
-        print(f"[LOG]->{e}")
+
+        err_msg = traceback.format_exc()
+        print(err_msg)
+
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Internal server error")
 
     finally:
@@ -108,14 +127,26 @@ async def refresh_token(refresh_token: str = Depends(oauth2_scheme), db: Session
     
     except HTTPException as http_ex:
         db.rollback()
+
+        err_msg = traceback.format_exc()
+        print(err_msg)
+
         raise http_ex
 
     except SQLAlchemyError as e:
         db.rollback()
+
+        err_msg = traceback.format_exc()
+        print(err_msg)
+
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Internal server error")
 
     except Exception as e:
         db.rollback()
+
+        err_msg = traceback.format_exc()
+        print(err_msg)
+
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Internal server error")
 
     finally:
@@ -140,17 +171,26 @@ async def read_user_me(access_token: str = Depends(oauth2_scheme), db: Session =
     
     except HTTPException as http_ex:
         db.rollback()
-        print(f"[LOG]->{http_ex}")
+
+        err_msg = traceback.format_exc()
+        print(err_msg)
+
         raise http_ex
 
     except SQLAlchemyError as e:
         db.rollback()
-        print( f"[LOG]->{e}")
+
+        err_msg = traceback.format_exc()
+        print(err_msg)
+
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Internal server error")
 
     except Exception as e:
         db.rollback()
-        print(f"[LOG]->{e}")
+
+        err_msg = traceback.format_exc()
+        print(err_msg)
+
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Internal server error")
 
     finally:

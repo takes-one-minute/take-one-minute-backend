@@ -16,10 +16,9 @@ class User(Base):
     created_at = Column(DateTime, nullable=False, default=datetime.now(timezone.utc))
     last_login = Column(DateTime)
 
-    posts = relationship("PsychArticle", back_populates="author")
+    articles = relationship("PsychArticle", back_populates="author")
     tokens = relationship("JwtToken", back_populates="user")
     profile_url = relationship("UserProfile", back_populates="user")
-
 
 class UserProfile(Base):
     __tablename__ = "user_profile"

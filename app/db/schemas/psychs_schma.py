@@ -8,22 +8,34 @@ class PsychType(Enum):
     QUIZ = "quiz"
     TOURNAMENT = "tournament"
 
+class PsychVisibility(Enum):
+    PUBLIC = "public" # 공개
+    PRIVATE = "private" # 비공개
+    LIMITED = "limited" # 일부공개
 
 class PsychArticleBase(BaseModel):
     title: str
     description: str
     type: PsychType
 
-class PsychArticleBaseScore(BaseModel):
-    title: str
-    description: str
+class PsychArticleAnswer(BaseModel):
+    answer: str
     score: int
+
+class PsychArticleQuestion(BaseModel):
+    question: str
+    answer = List[PsychArticleAnswer]
+
+class PsychArticleQuestions(BaseModel):
+    questions: List[PsychArticleQuestion] = Field(default_factory=list)
 
 
 class PsychArticleCreate(PsychArticleBase):
+    article_visibility : PsychVisibility
+    password : Optional[str] = None
     thumbnail_url: Optional[str] = None
-    questions: Optional[List[PsychArticleBaseScore]] = None
-    results: Optional[List[PsychArticleBaseScore]] = None
+    questions: Optional[List[PsychArticleQuestion]] = None
+    #results: Optional[List[PsychArticleBaseScore]] = None
 
 
 class PsychArticleResponse(PsychArticleBase):
@@ -35,8 +47,7 @@ class PsychArticleResponse(PsychArticleBase):
     created_at: datetime
     updated_at: Optional[datetime] = None
     thumbnail_url: Optional[str] = None
-    try_count: int
-
+    view_count: int
 
 class PsychArticlesResponse(BaseModel):
     posts: List[PsychArticleResponse] = Field(default_factory=list)
