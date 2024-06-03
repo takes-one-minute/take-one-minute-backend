@@ -18,6 +18,16 @@ class User(Base):
 
     posts = relationship("PsychArticle", back_populates="author")
     tokens = relationship("JwtToken", back_populates="user")
+    profile_url = relationship("UserProfile", back_populates="user")
+
+
+class UserProfile(Base):
+    __tablename__ = "user_profile"
+
+    user_id = Column(Integer, ForeignKey("users.id"), primary_key=True)
+    profile_url = Column(String(255), nullable=False)
+
+    user = relationship("User", back_populates="profile_url")
 
 class JwtToken(Base):
     __tablename__ = "jwt_tokens"

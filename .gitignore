@@ -2,3 +2,4 @@ __pycache__/
 *.py[cod]
 sql_app.db
 app/core/.env
+.DS_STORE

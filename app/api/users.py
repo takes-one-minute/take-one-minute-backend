@@ -132,10 +132,11 @@ async def read_user_me(access_token: str = Depends(oauth2_scheme), db: Session =
         # Get the user information
         user_id = payload.get("user_id")
         db_user = user_read.find_user_by_userid(db, user_id)
+        
         if not db_user:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
-        
-        return user_schema.User.model_validate(db_user)
+
+        return db_user
     
     except HTTPException as http_ex:
         db.rollback()

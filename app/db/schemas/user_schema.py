@@ -13,11 +13,11 @@ class UserCreate(UserBase):
     public_ip: Optional[str] = None
 
 
-
 class User(UserBase):
     id: int
     created_at: datetime
     last_login: Optional[datetime]
+    profile_url: Optional[str] = None
 
     class Config:
         from_attributes = True
