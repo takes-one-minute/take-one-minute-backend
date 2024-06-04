@@ -3,6 +3,8 @@ from db.models import user_model
 from db.schemas import user_schema
 from sqlalchemy import or_, and_, union_all
 
+from utils.jwt import Permission
+
 def find_user_by_email(db: Session, email: str):
     return db.query(user_model.User).filter(user_model.User.email == email).first()
 
@@ -56,5 +58,21 @@ def get_user_name(db: Session, user_id: int):
 
     if user:
         return user.nickname
+
+    return None
+
+
+def get_user_permission(db: Session, user_id: int):
+    user = db.query(user_model.User).filter(user_model.User.id == user_id).first()
+
+    if user:
+        permissions = ["-"]
+
+        result = [
+            Permission(perm)
+            for perm in permissions
+        ] 
+
+        return result
 
     return None

@@ -116,12 +116,8 @@ async def login_user(form_data: OAuth2PasswordRequestForm = Depends(), db: Sessi
 async def refresh_token(refresh_token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
     try:
         # Verify the refresh token
-        payload = await jwt.verify_token(refresh_token)
-        if not payload:
-            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
+        user_id = await jwt.get_user_id_from_token(token=token)
         
-        # Create a new access token
-        user_id = payload.get("user_id")
         access_token = await jwt.create_access_token("access", user_id)
         return user_schema.JwtToken(access_token=access_token, refresh_token=refresh_token)
     
@@ -156,12 +152,7 @@ async def refresh_token(refresh_token: str = Depends(oauth2_scheme), db: Session
 async def read_user_me(access_token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
     try:
         # Verify the access token
-        payload = await jwt.verify_token(access_token)
-        if not payload:
-            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
-        
-        # Get the user information
-        user_id = payload.get("user_id")
+        user_id = await jwt.get_user_id_from_token(token=access_token)
         db_user = user_read.find_user_by_userid(db, user_id)
         
         if not db_user:

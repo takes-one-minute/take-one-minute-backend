@@ -35,13 +35,28 @@ class PsychArticleQuestions(Base):
 
     id = Column(Integer, primary_key=True)
     question = Column(String(255), nullable=False)
-    description = Column(Text) 
-    score = Column(Integer, nullable=False, default=0)
+    description = Column(Text)
 
     article_id = Column(Integer, ForeignKey('psych_articles.id'))
 
     article = relationship("PsychArticle", back_populates="questions")
     answers = relationship("PsychArticleAnswer", back_populates="question", cascade="all, delete-orphan") # cascade="all, delete-orphan" = 부모가 삭제되면 자식도 삭제됨(일대다관계 설정)
+    attachments = relationship("PsychArticleQuestionAttachment", back_populates="question", cascade="all, delete-orphan")
+
+
+class PsychArticleQuestionAttachment(Base):
+    __tablename__ = "psych_article_attachment"
+
+    id = Column(Integer, primary_key=True)
+
+    image = Column(String(255))
+    video = Column(String(255))
+    audio = Column(String(255))
+
+    question_id = Column(Integer, ForeignKey('psych_article_questions.id'))
+
+    question = relationship("PsychArticleQuestions", back_populates="attachments")
+
 
 class PsychArticleAnswer(Base):
     __tablename__ = "psych_article_answers"

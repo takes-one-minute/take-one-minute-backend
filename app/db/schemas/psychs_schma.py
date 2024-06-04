@@ -22,20 +22,45 @@ class PsychArticleAnswer(BaseModel):
     answer: str
     score: int
 
+class PsychArticleAnswerStatistics(PsychArticleAnswer):
+    answer: str
+    score: int
+    count: int
+
+class PsychArticleQuestionAttachment(BaseModel):
+    image: Optional[str] = None
+    video: Optional[str] = None
+    audio: Optional[str] = None
+
 class PsychArticleQuestion(BaseModel):
+    index: int
     question: str
-    answer = List[PsychArticleAnswer]
+    description: Optional[str]
+    attachment: Optional[PsychArticleQuestionAttachment] = None
+    answers: List[PsychArticleAnswer]
+
+class PsychArticleQuestionStatistic(BaseModel):
+    index: int
+    question: str
+    description: Optional[str]
+    attachment: Optional[PsychArticleQuestionAttachment] = None
+    answers: List[PsychArticleAnswerStatistics]
 
 class PsychArticleQuestions(BaseModel):
     questions: List[PsychArticleQuestion] = Field(default_factory=list)
 
+class PsychArticleQuestionStatistics(BaseModel):
+    questions: List[PsychArticleQuestionStatistic] = Field(default_factory=list)
 
 class PsychArticleCreate(PsychArticleBase):
     article_visibility : PsychVisibility
     password : Optional[str] = None
     thumbnail_url: Optional[str] = None
-    questions: Optional[List[PsychArticleQuestion]] = None
-    #results: Optional[List[PsychArticleBaseScore]] = None
+    # questions: Optional[List[PsychArticleQuestion]] = None
+
+
+class PsychArticleUpdate(PsychArticleCreate):
+    pass
 
 
 class PsychArticleResponse(PsychArticleBase):
@@ -47,6 +72,7 @@ class PsychArticleResponse(PsychArticleBase):
     created_at: datetime
     updated_at: Optional[datetime] = None
     thumbnail_url: Optional[str] = None
+    article_visibility: PsychVisibility
     view_count: int
 
 class PsychArticlesResponse(BaseModel):

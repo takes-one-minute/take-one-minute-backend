@@ -45,7 +45,7 @@ def get_psych_post(db: Session, article_id: int) -> psychs_schma.PsychArticleRes
         author_profile = user_read.get_user_profile(db=db, user_id=db_article.author_id)
         
         return psychs_schma.PsychArticleResponse(
-            href=f"/psychs/article/{db_article.id}",
+            href=f"/psychs/{db_article.id}",
             id=db_article.id,
             title=db_article.title,
             description=db_article.description,
@@ -56,7 +56,8 @@ def get_psych_post(db: Session, article_id: int) -> psychs_schma.PsychArticleRes
             created_at=db_article.created_at,
             updated_at=db_article.updated_at,
             thumbnail_url=db_article.thumbnail_url,
-            view_count=db_article.view_count+1
+            view_count=db_article.view_count+1,
+            article_visibility=db_article.visibility
         )
 
     return None
@@ -64,22 +65,32 @@ def get_psych_post(db: Session, article_id: int) -> psychs_schma.PsychArticleRes
 def get_psych_questions_and_answer(db: Session, article_id: int) -> psychs_schma.PsychArticleResponse:
     """특정 게시글의 질문과 답변을 조회합니다.
     
-    Args:
-        db (Session): 데이터베이스 세션 객체.
-        article_id (int): 조회할 게시글의 ID.
-        
-    Returns:
-        PsychTestPost: 조회된 게시글과 작성자 정보를 포함한 객체.
+    :param db: 데이터베이스 세션 객체.
+    :param article_id: 조회할 게시글의 ID.
+    ###
+    :return: PsychTestPost: 조회된 게시글과 작성자 정보를 포함한 객체.
+    ###
     """
 
     db_article_questions = db.query(psych_model.PsychArticleQuestions).filter(psych_model.PsychArticleQuestions.article_id == article_id).all()
-    
+
     questions_list = []
-    if not db_article_questions:
-        for db_article_question in db_article_questions:
+
+    if db_article_questions:
+        for index, db_article_question in enumerate(db_article_questions):
+
             db_article_answers = db.query(psych_model.PsychArticleAnswer).filter(psych_model.PsychArticleAnswer.question_id == db_article_question.id).all()
+            question_attachment = db.query(psych_model.PsychArticleQuestionAttachment).filter(psych_model.PsychArticleQuestionAttachment.question_id == db_article_question.id).first()
+
             questions_list.append(psychs_schma.PsychArticleQuestion(
+                index=index,
                 question=db_article_question.question,
+                description=db_article_question.description,
+                attachment=psychs_schma.PsychArticleQuestionAttachment(
+                    image=question_attachment.image,
+                    video=question_attachment.video,
+                    audio=question_attachment.audio
+                ) if question_attachment else None,
                 answers=[psychs_schma.PsychArticleAnswer(
                     answer=db_article_answer.answer,
                     score=db_article_answer.score
@@ -89,3 +100,45 @@ def get_psych_questions_and_answer(db: Session, article_id: int) -> psychs_schma
         return psychs_schma.PsychArticleQuestions(questions=questions_list)
 
     return None
+
+
+def get_psych_question_statistics(db: Session, article_id: int) -> psychs_schma.PsychArticleQuestionStatistics:
+    db_article_questions = db.query(psych_model.PsychArticleQuestions).filter(psych_model.PsychArticleQuestions.article_id == article_id).all()
+
+    questions_list = []
+
+    if db_article_questions:
+        for index, db_article_question in enumerate(db_article_questions):
+
+            db_article_answers = db.query(psych_model.PsychArticleAnswer).filter(psych_model.PsychArticleAnswer.question_id == db_article_question.id).all()
+            question_attachment = db.query(psych_model.PsychArticleQuestionAttachment).filter(psych_model.PsychArticleQuestionAttachment.question_id == db_article_question.id).first()
+
+            questions_list.append(psychs_schma.PsychArticleQuestionStatistic(
+                index=index,
+                question=db_article_question.question,
+                description=db_article_question.description,
+                attachment=psychs_schma.PsychArticleQuestionAttachment(
+                    image=question_attachment.image,
+                    video=question_attachment.video,
+                    audio=question_attachment.audio
+                ) if question_attachment else None,
+                answers=[psychs_schma.PsychArticleAnswerStatistics(
+                    answer=db_article_answer.answer,
+                    score=db_article_answer.score,
+                    count=10
+                ) for db_article_answer in db_article_answers]
+            ))
+        
+        return psychs_schma.PsychArticleQuestionStatistics(questions=questions_list)
+
+    return None
+
+
+def get_psych_owner(db: Session, article_id: int) -> int:
+    db_article = db.query(psych_model.PsychArticle).filter(psych_model.PsychArticle.id == article_id).first()
+
+    if not db_article:
+        return None
+
+    return db_article.author_id
+    
